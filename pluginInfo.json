@@ -1,0 +1,20 @@
+{
+	"repoName": "fpp-plugin-controller",
+	"name": "Controller Plugin for FPP",
+	"author": "Scott Hanson (computergeek1507)",
+	"description": "This plugin allows controller test modes to be started/stopped.",
+	"homeURL": "https://github.com/computergeek1507/fpp-plugin-controller",
+	"srcURL": "https://github.com/computergeek1507/fpp-plugin-controller.git",
+	"bugURL": "https://github.com/computergeek1507/fpp-plugin-controller/issues",
+	"allowUpdates": 1,
+	"versions": [
+		{
+			"minFPPVersion": "7.0",
+			"maxFPPVersion": "0",
+			"branch": "main",
+			"sha": "",
+			"dependencies": {
+			}
+		}
+	]
+}
