@@ -52,7 +52,7 @@ public:
     public:
         ControllerTestOnCommand(ControllerPlugin *p) : Command("Set Test Mode On"), plugin(p) {
             args.push_back(CommandArg("IP", "string", "IP Address"));
-            args.push_back(CommandArg("type", "string", "Controller Type").setDefaultValue("FalconV4"));
+            args.push_back(CommandArg("type", "string", "Controller Type").setContentList({"FalconV4", "Genius"}).setDefaultValue("FalconV4"));
             args.push_back(CommandArg("ports", "int", "Set Number of Ports").setRange(0, 128).setDefaultValue("16"));
         }
         
@@ -79,19 +79,20 @@ public:
     public:
         ControllerTestOffCommand(ControllerPlugin *p) : Command("Set Test Mode Off"), plugin(p) {
             args.push_back(CommandArg("IP", "string", "IP Address")); 
-            args.push_back(CommandArg("type", "string", "Controller Type").setDefaultValue("FalconV4"));
+            args.push_back(CommandArg("type", "string", "Controller Type").setContentList({"FalconV4", "Genius"}).setDefaultValue("FalconV4"));
         }
         
         virtual std::unique_ptr<Command::Result> run(const std::vector<std::string> &args) override {
             std::string ipAddress = "";
             std::string type = "FalconV4";
+            int outputs = 16;//not used
             if (args.size() >= 1) {
                 ipAddress = args[0];
             }
             if (args.size() >= 2) {
                 type = args[1];
             }
-            plugin->SetControllerTestModeOff(ipAddress, type);
+            plugin->SetControllerTestModeOff(ipAddress, type, outputs);
             return std::make_unique<Command::Result>("Test Mode Off");
         }
         ControllerPlugin *plugin;
@@ -103,17 +104,29 @@ public:
     }
 
     void SetControllerTestModeOn(std::string const& ip, std::string const& type, int outputs) {
-        //TPLinkSwitch tplinkSwitch(ip, 1, plug_num);
-        //if(state){
-        //    tplinkSwitch.setRelayOn();
-        //} else{
-        //    tplinkSwitch.setRelayOff();
-        //}
+        std::unique_ptr<ControllerBase> controllerItem;
+        if (type.find("FalconV4") != std::string::npos) {
+            controllerItem = std::make_unique<FalconV4>(ip, outputs);
+        } else if (type.find("Genius") != std::string::npos) {
+            controllerItem = std::make_unique<Genius>(ip, outputs);
+        } else {
+            LogInfo(VB_PLUGIN, "controller type not found '%s'", type.c_str());
+            controllerItem = std::make_unique<FalconV4>(ip, outputs);
+        }
+        controllerItem->setTestModeOn();
     }
 
-    void SetControllerTestModeOff(std::string const& ip, std::string const& type) {
-        //TPLinkLight tplinkLight(ip, 1);
-       // tplinkLight.setLightOff();
+    void SetControllerTestModeOff(std::string const& ip, std::string const& type, int outputs) {
+       std::unique_ptr<ControllerBase> controllerItem;
+        if (type.find("FalconV4") != std::string::npos) {
+            controllerItem = std::make_unique<FalconV4>(ip, outputs);
+        } else if (type.find("Genius") != std::string::npos) {
+            controllerItem = std::make_unique<Genius>(ip, outputs);
+        } else {
+            LogInfo(VB_PLUGIN, "controller type not found '%s'", type.c_str());
+            controllerItem = std::make_unique<FalconV4>(ip, outputs);
+        }
+        controllerItem->setTestModeOff();
     }
 };
 
