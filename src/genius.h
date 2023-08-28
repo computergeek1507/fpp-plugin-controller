@@ -4,13 +4,13 @@
 
 class Genius : public ControllerBase{
 public:
-    Genius(std::string const& ip, unsigned int output_countm );
+    Genius(std::string const& ip, unsigned int output_count );
     virtual ~Genius();
 
     std::string GetType() const override {return "Genius";}
 
-    bool setTestModeOn( int outputs )const override;
-    bool setTestModeOff( int outputs )const override;
+    bool setTestModeOn( )const override;
+    bool setTestModeOff( )const override;
 
 private:
 

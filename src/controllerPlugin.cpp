@@ -39,18 +39,18 @@ class ControllerPlugin : public FPPPlugin, public httpserver::http_resource {
 private:
 
 public:
-    ControllerPluginPlugin() : FPPPlugin("fpp-plugin-ControllerPlugin") {
+    ControllerPlugin() : FPPPlugin("fpp-plugin-ControllerPlugin") {
         LogInfo(VB_PLUGIN, "Initializing Controller Plugin\n");
-        readFiles();
+        //readFiles();
         registerCommand();
     }
-    virtual ~TPLinkPlugin() {
+    virtual ~ControllerPlugin() {
 
     }
 
     class ControllerTestOnCommand : public Command {
     public:
-        ControllerTestOnCommand(TPLinkPlugin *p) : Command("Set Test Mode On"), plugin(p) {
+        ControllerTestOnCommand(ControllerPlugin *p) : Command("Set Test Mode On"), plugin(p) {
             args.push_back(CommandArg("IP", "string", "IP Address"));
             args.push_back(CommandArg("type", "string", "Controller Type").setDefaultValue("FalconV4"));
             args.push_back(CommandArg("ports", "int", "Set Number of Ports").setRange(0, 128).setDefaultValue("16"));
@@ -58,40 +58,43 @@ public:
         
         virtual std::unique_ptr<Command::Result> run(const std::vector<std::string> &args) override {
             std::string ipAddress = "";
-            bool bulbOn = true;
-            int plug_num = 0;
+            std::string type = "FalconV4";
+            int outputs = 16;
             if (args.size() >= 1) {
                 ipAddress = args[0];
             }
             if (args.size() >= 2) {
-                bulbOn = args[1]=="true";
+                type = args[1];
             }
             if (args.size() >= 3) {
-                plug_num = std::stoi(args[2]);
+                outputs = std::stoi(args[2]);
             }
-            plugin->SetSwitchState(ipAddress, bulbOn, plug_num);
+            plugin->SetControllerTestModeOn(ipAddress, type, outputs);
             return std::make_unique<Command::Result>("Test Mode On");
         }
-        TPLinkPlugin *plugin;
+        ControllerPlugin *plugin;
     };      
 
     class ControllerTestOffCommand : public Command {
     public:
-        ControllerTestOffCommand(TPLinkPlugin *p) : Command("Set Test Mode Off"), plugin(p) {
+        ControllerTestOffCommand(ControllerPlugin *p) : Command("Set Test Mode Off"), plugin(p) {
             args.push_back(CommandArg("IP", "string", "IP Address")); 
             args.push_back(CommandArg("type", "string", "Controller Type").setDefaultValue("FalconV4"));
         }
         
         virtual std::unique_ptr<Command::Result> run(const std::vector<std::string> &args) override {
             std::string ipAddress = "";
+            std::string type = "FalconV4";
             if (args.size() >= 1) {
                 ipAddress = args[0];
             }
-
-            plugin->SetLightOff(ipAddress);
+            if (args.size() >= 2) {
+                type = args[1];
+            }
+            plugin->SetControllerTestModeOff(ipAddress, type);
             return std::make_unique<Command::Result>("Test Mode Off");
         }
-        TPLinkPlugin *plugin;
+        ControllerPlugin *plugin;
     };
 
     void registerCommand() {
@@ -99,7 +102,7 @@ public:
         CommandManager::INSTANCE.addCommand(new ControllerTestOffCommand(this));
     }
 
-    void SetSwitchState(std::string const& ip, bool state, int plug_num) {
+    void SetControllerTestModeOn(std::string const& ip, std::string const& type, int outputs) {
         //TPLinkSwitch tplinkSwitch(ip, 1, plug_num);
         //if(state){
         //    tplinkSwitch.setRelayOn();
@@ -108,7 +111,7 @@ public:
         //}
     }
 
-    void SetLightOff(std::string const& ip) {
+    void SetControllerTestModeOff(std::string const& ip, std::string const& type) {
         //TPLinkLight tplinkLight(ip, 1);
        // tplinkLight.setLightOff();
     }
@@ -117,6 +120,6 @@ public:
 
 extern "C" {
     FPPPlugin *createPlugin() {
-        return new TPLinkPlugin();
+        return new ControllerPlugin();
     }
 }

@@ -13,7 +13,7 @@
 #include <istream>
 #include <ostream>
 
-FalconV4::FalconV4(std::string const& ip, unsigned int output_countm) :
+FalconV4::FalconV4(std::string const& ip, unsigned int output_count) :
     ControllerBase(ip,output_count)
 {
 
@@ -23,17 +23,16 @@ FalconV4::~FalconV4() {
 
 }
 
-bool FalconV4::setTestModeOn( int outputs) const {
+bool FalconV4::setTestModeOn() const {
     //{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"ignore_default":1,"transition_period":150,"mode":"normal","hue":120,"on_off":1,"saturation":65,"color_temp":0,"brightness":10}}}
     
-    const std::string cmd = "{\"smartlife.iot.smartbulb.lightingservice\":{\"transition_light_state\":{\"ignore_default\":1,\"transition_period\":" + std::to_string(period) + ",\"mode\":\"normal\",\"hue\":" 
-    + std::to_string(hue) + ",\"on_off\":1,\"saturation\":" + std::to_string(saturation) + ",\"color_temp\":" + std::to_string(color_Temp) + ",\"brightness\":" + std::to_string(brightness) + "}}}";
-    return sendCmd(cmd);
+    //const std::string cmd = "{\"smartlife.iot.smartbulb.lightingservice\":{\"transition_light_state\":{\"ignore_default\":1,\"transition_period\":,\"mode\":\"normal\",\"hue\":,\"on_off\":1,\"saturation\":,\"color_temp\":,\"brightness\":}}}";
+    return true; //postData(cmd);
 }
 
 bool FalconV4::setTestModeOff() const {
 
-    const std::string cmd = "{\"smartlife.iot.smartbulb.lightingservice\":{\"transition_light_state\":{\"ignore_default\":1,\"transition_period\":0,\"mode\":\"normal\",\"on_off\":0}}}";
-    return sendCmd(cmd);
+    //const std::string cmd = "{\"smartlife.iot.smartbulb.lightingservice\":{\"transition_light_state\":{\"ignore_default\":1,\"transition_period\":0,\"mode\":\"normal\",\"on_off\":0}}}";
+    return true; //postData(cmd);
 }
 
