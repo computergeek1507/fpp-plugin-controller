@@ -1,31 +1,19 @@
 #pragma once
 
-#include "TPLinkItem.h"
+#include "controller_base.h"
 
 #include <string>
 
-class TPLinkSwitch : public TPLinkItem{
+class FalconV4 : public ControllerBase{
 public:
-    TPLinkSwitch(std::string const& ip, unsigned int startChannel, int plug_num );
-    virtual ~TPLinkSwitch();
+    FalconV4(std::string const& ip, unsigned int output_countm );
+    virtual ~FalconV4();
 
-    bool SendData( unsigned char *data) override;
+    std::string GetType() const override {return "FalconV4";}
 
-    std::string setRelayOn();
-    std::string setRelayOff();
-
-    std::string setLedOn();
-    std::string setLedOff();
-
-    std::string GetType() const override {return "Switch";}
-    std::string GetConfigString() const override;
+    bool setTestModeOn( int outputs )const override;
+    bool setTestModeOff( int outputs )const override;
 
 private:
-    uint8_t m_w;
-    int m_plug_num;
-    std::string m_deviceId;
 
-    void outputData( uint8_t w );
-    std::string getDeviceId(int plug_num);
-    std::string appendPlugData(std::string cmd);
 };

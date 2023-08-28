@@ -8,39 +8,28 @@
 //#include "common.h"
 #include "log.h"
 
-class TPLinkItem {
+class ControllerBase {
 public:
-    TPLinkItem(std::string const& ip, unsigned int startChannel );
-    virtual ~TPLinkItem();
+    ControllerBase(std::string const& ip, unsigned int output_count );
+    virtual ~ControllerBase();
 
     std::string GetIPAddress() const { return m_ipAddress; }
-    unsigned int GetStartChannel() const { return m_startChannel; }
-
-    void EnableOutput() { m_unreachable = false; m_issending = false; }
-
-    virtual bool SendData(unsigned char *data) = 0;
-
     virtual std::string GetType() const = 0;
-    virtual std::string GetConfigString() const = 0;
 
-    std::string getInfo();
+    virtual bool setTestModeOn( int outputs )const = 0;
+    virtual bool setTestModeOff( int outputs )const = 0;
+
+    virtual std::string GetConfigString() const {
+        return "IP: " + GetIPAddress() + " Device Type: " + GetType();
+    }
 
 protected:
     std::string m_ipAddress;
-    uint16_t m_port;
-    unsigned int m_startChannel;
-    unsigned int m_seqCount;
-
-    std::atomic<bool> m_unreachable;
-    std::atomic<bool> m_issending;
+    uint16_t m_outputs;
 
     std::string sendCmd(std::string const& cmd);
 
 private:
-    static void serializeUint32(char (&buf)[4], uint32_t val);
-    static void encrypt(char *data, uint16_t length);
-    static void encryptWithHeader(char *out, char *data, uint16_t length);
-    static void decrypt(char* input, uint16_t length);
-    uint16_t sockConnect(char* out, const char *ip_add, int port, const char *cmd, uint16_t length);
+
 
 };
