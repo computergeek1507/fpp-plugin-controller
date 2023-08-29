@@ -13,7 +13,7 @@
 
 $menuEntries = Array(
 	Array(
-		'text' => 'TPLink - About',
+		'text' => 'Controllers - About',
 		'type' => 'help',
 		'page' => 'about.php',
 		'wrap' => 1

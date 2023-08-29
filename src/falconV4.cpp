@@ -26,13 +26,13 @@ FalconV4::~FalconV4() {
 bool FalconV4::setTestModeOn() const {
     //{"T":"S","M":"TS","B":0,"E":16,"I":0,"P":{"E":"Y","D":"Y","S":20,"Y":1,"A":[{"P":0,"R":0,"S":0},{"P":1,"R":0,"S":0},{"P":1,"R":0,"S":0},{"P":3,"R":0,"S":0},{"P":4,"R":0,"S":0}]}}
     //{"T":"S","M":"TS","B":2,"E":16,"I":10,"P":{"E":"Y","D":"Y","S":20,"Y":1,"A":[{"P":10,"R":0,"S":0},{"P":11,"R":0,"S":0},{"P":12,"R":0,"S":0},{"P":13,"R":0,"S":0},{"P":14,"R":0,"S":0}]}}
+    //{"T":"S","M":"TS","B":3,"E":16,"I":15,"P":{"E":"Y","D":"Y","S":20,"Y":1,"A":[{"P":15,"R":0,"S":0}]}}
     static constexpr int PORT_PER = 5;
-    int numberOfCalls = std::ceil(m_outputs / PORT_PER);
-     bool test = true;
-
+    int numberOfCalls = std::ceil((double)m_outputs / PORT_PER);
+    bool test = true;
     for (int j = 0; j < numberOfCalls; j++) {
         int index2 = j * PORT_PER;
-        std::string cmd = "{\"T\":\"S\",\"M\":\"TS\",\"B\":" + std::to_string(j) + ",\"E\":16,\"I\":" + std::to_string(j) + ",\"P\":{\"E\":\"Y\",\"D\":\"Y\",\"S\":20,\"Y\":1,\"A\":[";
+        std::string cmd = "{\"T\":\"S\",\"M\":\"TS\",\"B\":" + std::to_string(j) + ",\"E\":16,\"I\":" + std::to_string(index2) + ",\"P\":{\"E\":\"Y\",\"D\":\"Y\",\"S\":20,\"Y\":1,\"A\":[";
         for (int i = 0; i < PORT_PER; i++) {
             if(index2 + i >= m_outputs) {
                 break;
