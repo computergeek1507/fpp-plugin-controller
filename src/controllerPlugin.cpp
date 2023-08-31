@@ -50,7 +50,7 @@ public:
 
     class ControllerTestOnCommand : public Command {
     public:
-        ControllerTestOnCommand(ControllerPlugin *p) : Command("Set Test Mode On"), plugin(p) {
+        ControllerTestOnCommand(ControllerPlugin *p) : Command("Controller Set Test Mode On"), plugin(p) {
             args.push_back(CommandArg("IP", "string", "IP Address"));
             args.push_back(CommandArg("type", "string", "Controller Type").setContentList({"FalconV4", "Genius"}).setDefaultValue("FalconV4"));
             args.push_back(CommandArg("ports", "int", "Set Number of Ports").setRange(0, 128).setDefaultValue("16"));
@@ -77,7 +77,7 @@ public:
 
     class ControllerTestOffCommand : public Command {
     public:
-        ControllerTestOffCommand(ControllerPlugin *p) : Command("Set Test Mode Off"), plugin(p) {
+        ControllerTestOffCommand(ControllerPlugin *p) : Command("Controller Set Test Mode Off"), plugin(p) {
             args.push_back(CommandArg("IP", "string", "IP Address")); 
             args.push_back(CommandArg("type", "string", "Controller Type").setContentList({"FalconV4", "Genius"}).setDefaultValue("FalconV4"));
         }
@@ -103,29 +103,24 @@ public:
         CommandManager::INSTANCE.addCommand(new ControllerTestOffCommand(this));
     }
 
-    void SetControllerTestModeOn(std::string const& ip, std::string const& type, int outputs) {
-        std::unique_ptr<ControllerBase> controllerItem;
+    std::unique_ptr<ControllerBase> MakeController(std::string const& ip, std::string const& type, int outputs) {
         if (type.find("FalconV4") != std::string::npos) {
-            controllerItem = std::make_unique<FalconV4>(ip, outputs);
+            return std::move(std::make_unique<FalconV4>(ip, outputs));
         } else if (type.find("Genius") != std::string::npos) {
-            controllerItem = std::make_unique<Genius>(ip, outputs);
+            return std::move(std::make_unique<Genius>(ip, outputs));
         } else {
             LogInfo(VB_PLUGIN, "controller type not found '%s'", type.c_str());
-            controllerItem = std::make_unique<FalconV4>(ip, outputs);
         }
+        return std::move(std::make_unique<FalconV4>(ip, outputs));
+    }
+
+    void SetControllerTestModeOn(std::string const& ip, std::string const& type, int outputs) {
+        std::unique_ptr<ControllerBase> controllerItem = MakeController(ip, type, outputs);
         controllerItem->setTestModeOn();
     }
 
     void SetControllerTestModeOff(std::string const& ip, std::string const& type, int outputs) {
-       std::unique_ptr<ControllerBase> controllerItem;
-        if (type.find("FalconV4") != std::string::npos) {
-            controllerItem = std::make_unique<FalconV4>(ip, outputs);
-        } else if (type.find("Genius") != std::string::npos) {
-            controllerItem = std::make_unique<Genius>(ip, outputs);
-        } else {
-            LogInfo(VB_PLUGIN, "controller type not found '%s'", type.c_str());
-            controllerItem = std::make_unique<FalconV4>(ip, outputs);
-        }
+        std::unique_ptr<ControllerBase> controllerItem = MakeController(ip, type, outputs);
         controllerItem->setTestModeOff();
     }
 };
