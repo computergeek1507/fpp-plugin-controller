@@ -31,8 +31,9 @@
 
 #include "commands/Commands.h"
 
-#include "genius.h"
-#include "falconV4.h"
+#include "genius_controller.h"
+#include "falconV4_controller.h"
+#include "fpp_controller.h"
 #include "controller_base.h"
 
 class ControllerPlugin : public FPPPlugin, public httpserver::http_resource {
@@ -52,7 +53,7 @@ public:
     public:
         ControllerTestOnCommand(ControllerPlugin *p) : Command("Controller Set Test Mode On"), plugin(p) {
             args.push_back(CommandArg("IP", "string", "IP Address"));
-            args.push_back(CommandArg("type", "string", "Controller Type").setContentList({"FalconV4", "Genius"}).setDefaultValue("FalconV4"));
+            args.push_back(CommandArg("type", "string", "Controller Type").setContentList({"FalconV4", "Genius", "FPP"}).setDefaultValue("FalconV4"));
             args.push_back(CommandArg("ports", "int", "Set Number of Ports").setRange(0, 128).setDefaultValue("16"));
         }
         
@@ -105,13 +106,15 @@ public:
 
     std::unique_ptr<ControllerBase> MakeController(std::string const& ip, std::string const& type, int outputs) {
         if (type.find("FalconV4") != std::string::npos) {
-            return std::move(std::make_unique<FalconV4>(ip, outputs));
+            return std::move(std::make_unique<FalconV4Controller>(ip, outputs));
         } else if (type.find("Genius") != std::string::npos) {
-            return std::move(std::make_unique<Genius>(ip, outputs));
+            return std::move(std::make_unique<GeniusController>(ip, outputs));
+        } else if (type.find("FPP") != std::string::npos) {
+            return std::move(std::make_unique<FPPController>(ip, outputs));
         } else {
             LogInfo(VB_PLUGIN, "controller type not found '%s'", type.c_str());
         }
-        return std::move(std::make_unique<FalconV4>(ip, outputs));
+        return std::move(std::make_unique<FalconV4Controller>(ip, outputs));
     }
 
     void SetControllerTestModeOn(std::string const& ip, std::string const& type, int outputs) {
@@ -124,7 +127,6 @@ public:
         controllerItem->setTestModeOff();
     }
 };
-
 
 extern "C" {
     FPPPlugin *createPlugin() {

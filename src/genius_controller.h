@@ -2,10 +2,10 @@
 
 #include "controller_base.h"
 
-class Genius : public ControllerBase{
+class GeniusController : public ControllerBase{
 public:
-    Genius(std::string const& ip, unsigned int output_count );
-    virtual ~Genius();
+    GeniusController(std::string const& ip, unsigned int output_count );
+    virtual ~GeniusController();
 
     std::string GetType() const override {return "Genius";}
 

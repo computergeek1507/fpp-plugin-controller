@@ -1,19 +1,19 @@
-#include "genius.h"
+#include "genius_controller.h"
 
 #include <iostream>
 #include <istream>
 #include <ostream>
 
-Genius::Genius(std::string const& ip, unsigned int output_count) :
+GeniusController::GeniusController(std::string const& ip, unsigned int output_count) :
     ControllerBase(ip,output_count)
 {
 }
 
-Genius::~Genius() {
+GeniusController::~GeniusController() {
 
 }
 
-bool Genius::setTestModeOn() const {
+bool GeniusController::setTestModeOn() const {
     std::string data;
     const std::string url = "/api/test_mode_enable";
     bool test = getData(url, data, "application/json" );
@@ -22,7 +22,7 @@ bool Genius::setTestModeOn() const {
     return test;
 }
 
-bool Genius::setTestModeOff() const {
+bool GeniusController::setTestModeOff() const {
     std::string data;
     const std::string url = "/api/test_mode_disable";
     return getData(url, data, "application/json" );
