@@ -149,8 +149,8 @@ public:
     void registerCommand() {
         CommandManager::INSTANCE.addCommand(new ControllerTestOnCommand(this));
         CommandManager::INSTANCE.addCommand(new ControllerTestOffCommand(this));
-        CommandManager::INSTANCE.addCommand(new ControllerTestOnCommand(this));
-        CommandManager::INSTANCE.addCommand(new ControllerTestOffCommand(this));
+        CommandManager::INSTANCE.addCommand(new ControllerTestOnAutoCommand(this));
+        CommandManager::INSTANCE.addCommand(new ControllerTestOffAutoCommand(this));
     }
 
     std::unique_ptr<ControllerBase> MakeController(std::string const& ip, std::string const& type, int outputs) {
@@ -163,7 +163,7 @@ public:
         } else if (type.find("FalconV3") != std::string::npos) {
             return std::move(std::make_unique<FalconV3Controller>(ip, outputs));
         } else {
-            LogInfo(VB_PLUGIN, "controller type not found '%s'", type.c_str());
+            LogInfo(VB_PLUGIN, "controller type not found '%s'\n", type.c_str());
         }
         return std::move(std::make_unique<FalconV4Controller>(ip, outputs));
     }
@@ -178,7 +178,7 @@ public:
         } else if (0x85 == type || 0x87 == type) {
             return std::move(std::make_unique<FalconV3Controller>(ip, outputs));
         } else {
-            LogInfo(VB_PLUGIN, "controller type not found '%d'", type);
+            LogInfo(VB_PLUGIN, "controller type not found '%d'\n", type);
         }
         return std::move(std::make_unique<FalconV4Controller>(ip, outputs));
     }
@@ -270,7 +270,12 @@ public:
                 return true;
             }
         }
-        LogInfo(VB_PLUGIN, "IP Address not found in Multisync local list '%s'", ip.c_str());
+        for (auto system : multiSync->GetRemoteSystems()){
+            if(system.address == ip){
+                 return true;
+            }
+        }
+        LogInfo(VB_PLUGIN, "IP Address not found in Multisync local list '%s'\n", ip.c_str());
         return false;
     }
 
@@ -281,7 +286,12 @@ public:
                 return system.type;
             }
         }
-        LogInfo(VB_PLUGIN, "IP Address not found in Multisync local list '%s'", ip.c_str());
+        for (auto system : multiSync->GetRemoteSystems()){
+            if(system.address == ip){
+                return system.type;
+            }
+        }
+        LogInfo(VB_PLUGIN, "IP Address not found in Multisync local list '%s'\n", ip.c_str());
         return MultiSyncSystemType::kSysTypeUnknown;
     }
 };
