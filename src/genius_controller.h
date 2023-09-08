@@ -9,8 +9,10 @@ public:
 
     std::string GetType() const override {return "Genius";}
 
-    bool setTestModeOn( )const override;
-    bool setTestModeOff( )const override;
+    bool setTestModeOn() const override;
+    bool setTestModeOff() const override;
+
+    bool isInTestMode() const override;
 
 private:
 

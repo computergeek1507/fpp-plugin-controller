@@ -11,8 +11,10 @@ public:
 
     std::string GetType() const override {return "FalconV3";}
 
-    bool setTestModeOn( )const override;
-    bool setTestModeOff( )const override;
+    bool setTestModeOn() const override;
+    bool setTestModeOff() const override;
+
+    bool isInTestMode() const override;
 
 private:
 

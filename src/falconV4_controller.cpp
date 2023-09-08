@@ -55,3 +55,18 @@ bool FalconV4Controller::setTestModeOff() const {
     return postData("/api", cmd, "application/json");
 }
 
+bool FalconV4Controller::isInTestMode() const {
+    const std::string cmd = R"({"T":"Q","M":"ST","B":0,"E":0,"I":0,"P":{}})";
+    std::string data;
+    bool worked = postData("/api", cmd, data, "application/json");
+
+    if(data.find("\"TS\"") != std::string::npos && data.find("\"TS\":0") != std::string::npos) {
+        return false;
+    }
+    if(data.find("\"TS\"") != std::string::npos) {
+        return true;
+    }
+    //""TS":0"
+    return false;
+}
+

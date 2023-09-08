@@ -39,3 +39,16 @@ bool FalconV3Controller::setTestModeOff() const {
     return postData("/test.htm", cmd, "application/x-www-form-urlencoded; charset=UTF-8");
 }
 
+bool FalconV3Controller::isInTestMode() const 
+{
+    //strings.xml
+    std::string data;
+    bool worked = getData("/strings.xml", data, "application/text");
+
+    if(data.find("t='1'") != std::string::npos) {
+        return true;
+    }
+    //t="0"
+    return false;
+}
+

@@ -18,8 +18,11 @@ public:
     std::string GetIPAddress() const { return m_ipAddress; }
     virtual std::string GetType() const = 0;
 
-    virtual bool setTestModeOn( )const = 0;
-    virtual bool setTestModeOff( )const = 0;
+    virtual bool setTestModeOn() const = 0;
+    virtual bool setTestModeOff() const = 0;
+
+    virtual bool toggleTestMode() const;
+    virtual bool isInTestMode() const = 0;
 
     virtual std::string GetConfigString() const {
         return "IP: " + GetIPAddress() + " Device Type: " + GetType();
@@ -38,6 +41,7 @@ protected:
     CURL *m_curl;
 
     bool postData(std::string const& url, std::string const& data, std::string const& contentType ) const;
+    bool postData(std::string const& url, std::string const& data, std::string& response_string, std::string const& contentType ) const;
     bool getData(std::string const& url, std::string& response_string, std::string const& contentType ) const;
 
 private:

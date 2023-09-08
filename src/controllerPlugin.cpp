@@ -126,7 +126,7 @@ public:
             return std::make_unique<Command::Result>("Controller Test Mode On Auto");
         }
         ControllerPlugin *plugin;
-    };      
+    };
 
     class ControllerTestOffAutoCommand : public Command {
     public:
@@ -146,11 +146,64 @@ public:
         ControllerPlugin *plugin;
     };
 
+    class ControllerToggleTestCommand : public Command {
+    public:
+        ControllerToggleTestCommand(ControllerPlugin *p) : Command("Controller Toggle Test Mode"), plugin(p) {
+            args.push_back(CommandArg("IP", "string", "IP Address"));
+            args.push_back(CommandArg("type", "string", "Controller Type").setContentList({"FalconV4", "Genius", "FPP", "FalconV3"}).setDefaultValue("FalconV4"));
+            args.push_back(CommandArg("ports", "int", "Set Number of Ports").setRange(0, 128).setDefaultValue("16"));
+            args.push_back(CommandArg("check", "bool", "Only do Request If IP is in Multisync List").setDefaultValue("false"));
+        }
+        
+        virtual std::unique_ptr<Command::Result> run(const std::vector<std::string> &args) override {
+            std::string ipAddress = "";
+            std::string type = "FalconV4";
+            int outputs = 16;
+            bool checkList = false;
+            if (args.size() >= 1) {
+                ipAddress = args[0];
+            }
+            if (args.size() >= 2) {
+                type = args[1];
+            }
+            if (args.size() >= 3) {
+                outputs = std::stoi(args[2]);
+            }
+            if (args.size() >= 4) {
+                checkList = args[3]=="true";
+            }
+            plugin->ToggleControllerTestMode(ipAddress, type, outputs, checkList);
+            return std::make_unique<Command::Result>("Controller Toggle Test Mode");
+        }
+        ControllerPlugin *plugin;
+    };
+
+    class ControllerToggleTestAutoCommand : public Command {
+    public:
+        ControllerToggleTestAutoCommand(ControllerPlugin *p) : Command("Controller Toggle Test Mode Auto"), plugin(p) {
+            args.push_back(CommandArg("IP", "string", "IP Address"));
+        }
+        
+        virtual std::unique_ptr<Command::Result> run(const std::vector<std::string> &args) override {
+            std::string ipAddress = "";
+
+            if (args.size() >= 1) {
+                ipAddress = args[0];
+            }
+            
+            plugin->ToggleControllerTestMode(ipAddress);
+            return std::make_unique<Command::Result>("Controller Toggle Test Mode Auto");
+        }
+        ControllerPlugin *plugin;
+    };  
+
     void registerCommand() {
         CommandManager::INSTANCE.addCommand(new ControllerTestOnCommand(this));
-        CommandManager::INSTANCE.addCommand(new ControllerTestOffCommand(this));
         CommandManager::INSTANCE.addCommand(new ControllerTestOnAutoCommand(this));
+        CommandManager::INSTANCE.addCommand(new ControllerTestOffCommand(this));
         CommandManager::INSTANCE.addCommand(new ControllerTestOffAutoCommand(this));
+        CommandManager::INSTANCE.addCommand(new ControllerToggleTestCommand(this));
+        CommandManager::INSTANCE.addCommand(new ControllerToggleTestAutoCommand(this));
     }
 
     std::unique_ptr<ControllerBase> MakeController(std::string const& ip, std::string const& type, int outputs) {
@@ -260,6 +313,46 @@ public:
             }
             std::unique_ptr<ControllerBase> controllerItem = MakeController(ip, type, 16);
             controllerItem->setTestModeOff();
+        }
+    }
+
+    void ToggleControllerTestMode(std::string const& ip, std::string const& type, int outputs, bool checkMulti) {
+        if(ip.find(",") != std::string::npos) {
+            auto ips = split(ip, ',');
+            for(auto const& ip_ : ips) {
+                if(checkMulti && !IsInMultiSyncList(ip_)) {
+                    continue;
+                }
+                std::unique_ptr<ControllerBase> controllerItem = MakeController(ip_, type, outputs);
+                controllerItem->toggleTestMode();
+            }
+        } else {
+            if(checkMulti && !IsInMultiSyncList(ip)) {
+                return;
+            }
+            std::unique_ptr<ControllerBase> controllerItem = MakeController(ip, type, outputs);
+            controllerItem->toggleTestMode();
+        }
+    }
+
+    void ToggleControllerTestMode(std::string const& ip) {
+        if(ip.find(",") != std::string::npos) {
+            auto ips = split(ip, ',');
+            for(auto const& ip_ : ips) {
+                auto type = GetMultiSyncType(ip);
+            if(type == MultiSyncSystemType::kSysTypeUnknown) {
+                return;
+            }
+                std::unique_ptr<ControllerBase> controllerItem = MakeController(ip_, type, 16);
+                controllerItem->toggleTestMode();
+            }
+        } else {
+            auto type = GetMultiSyncType(ip);
+            if(type == MultiSyncSystemType::kSysTypeUnknown) {
+                return;
+            }
+            std::unique_ptr<ControllerBase> controllerItem = MakeController(ip, type, 16);
+            controllerItem->toggleTestMode();
         }
     }
 

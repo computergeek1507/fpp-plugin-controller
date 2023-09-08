@@ -17,7 +17,22 @@ ControllerBase::~ControllerBase() {
     }
 }
 
-bool ControllerBase::postData(std::string const& url, std::string const& data, std::string const& contentType) const {
+
+bool ControllerBase::toggleTestMode() const 
+{
+    if(isInTestMode())
+    {
+        return setTestModeOff();
+    }
+    return setTestModeOn();
+}
+
+bool ControllerBase::postData(std::string const& url, std::string const& data, std::string const& contentType ) const {
+    std::string response_string;
+    return postData(url, data, response_string, contentType);
+}
+
+bool ControllerBase::postData(std::string const& url, std::string const& data, std::string& response_string, std::string const& contentType) const {
     try {
         curl_easy_setopt(m_curl, CURLOPT_HTTPPOST, 1L);
 
@@ -35,6 +50,9 @@ bool ControllerBase::postData(std::string const& url, std::string const& data, s
         curl_easy_setopt(m_curl, CURLOPT_TIMEOUT, 10L);
         curl_easy_setopt(m_curl, CURLOPT_TCP_KEEPALIVE, 1L);
         curl_easy_setopt(m_curl, CURLOPT_MAXAGE_CONN, 120L);
+
+        curl_easy_setopt(m_curl, CURLOPT_WRITEFUNCTION, writeFunction);
+        curl_easy_setopt(m_curl, CURLOPT_WRITEDATA, &response_string);
 
         CURLcode status = curl_easy_perform(m_curl);
         if (status != CURLE_OK) {

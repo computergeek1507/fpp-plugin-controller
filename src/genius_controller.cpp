@@ -1,4 +1,8 @@
+#include <fpp-pch.h>
+
 #include "genius_controller.h"
+#include "common.h"
+#include "settings.h"
 
 #include <iostream>
 #include <istream>
@@ -27,3 +31,20 @@ bool GeniusController::setTestModeOff() const {
     const std::string url = "/api/test_mode_disable";
     return getData(url, data, "application/json" );
 }
+
+bool GeniusController::isInTestMode() const
+ {
+    // /api/state
+    //"test_mode_enabled": true,
+
+    std::string data;
+    const std::string url = "/api/state";
+    bool work = getData(url, data, "application/json" );
+    Json::Value v = LoadJsonFromString(data);
+
+    if (v["system"]["test_mode_enabled"].asBool()) {
+        return true;
+    }
+
+    return false;
+ }
