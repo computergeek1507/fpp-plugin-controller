@@ -4,10 +4,6 @@
 #include "common.h"
 #include "settings.h"
 
-#include <iostream>
-#include <istream>
-#include <ostream>
-
 GeniusController::GeniusController(std::string const& ip, unsigned int output_count) :
     ControllerBase(ip,output_count)
 {

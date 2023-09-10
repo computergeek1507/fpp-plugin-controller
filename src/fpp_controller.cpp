@@ -3,9 +3,6 @@
 #include "fpp_controller.h"
 #include "common.h"
 #include "settings.h"
-#include <iostream>
-#include <istream>
-#include <ostream>
 
 FPPController::FPPController(std::string const& ip, unsigned int output_count) :
     ControllerBase(ip,output_count)

@@ -4,12 +4,12 @@
 
 #include <string>
 
-class FPPController : public ControllerBase{
+class WLEDController : public ControllerBase{
 public:
-    FPPController(std::string const& ip, unsigned int output_count );
-    virtual ~FPPController();
+    WLEDController(std::string const& ip, unsigned int output_count );
+    virtual ~WLEDController();
 
-    std::string GetType() const override {return "FPP";}
+    std::string GetType() const override {return "WLED";}
 
     bool setTestModeOn() const override;
     bool setTestModeOff() const override;

@@ -4,15 +4,6 @@
 #include "common.h"
 #include "settings.h"
 
-#include <stdlib.h>
-#include <cstdint>
-#include <thread>
-#include <cmath>
-
-#include <iostream>
-#include <istream>
-#include <ostream>
-
 FalconV4Controller::FalconV4Controller(std::string const& ip, unsigned int output_count) :
     ControllerBase(ip,output_count)
 {

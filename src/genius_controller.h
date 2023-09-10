@@ -2,6 +2,8 @@
 
 #include "controller_base.h"
 
+#include <string>
+
 class GeniusController : public ControllerBase{
 public:
     GeniusController(std::string const& ip, unsigned int output_count );

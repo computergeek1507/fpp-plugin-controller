@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <list>
 #include <string>
-#include <atomic>
 
 //#include "common.h"
 #include "log.h"

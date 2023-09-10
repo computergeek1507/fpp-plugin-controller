@@ -1,9 +1,5 @@
 #include "controller_base.h"
 
-#include <iostream>
-#include <istream>
-#include <ostream>
-
 ControllerBase::ControllerBase(std::string const& ip, unsigned int output_count) :
     m_ipAddress(ip),
     m_outputs(output_count)
@@ -16,7 +12,6 @@ ControllerBase::~ControllerBase() {
         curl_easy_cleanup(m_curl);
     }
 }
-
 
 bool ControllerBase::toggleTestMode() const 
 {
@@ -42,7 +37,7 @@ bool ControllerBase::postData(std::string const& url, std::string const& data, s
         curl_easy_setopt(m_curl, CURLOPT_HTTPHEADER, hs);
 
         LogInfo(VB_PLUGIN, "Data '%s'\n",data.c_str());
-        curl_easy_setopt(m_curl, CURLOPT_POSTFIELDS, data.c_str());       
+        curl_easy_setopt(m_curl, CURLOPT_POSTFIELDS, data.c_str());
 
         std::string const repURL = "http://" + m_ipAddress + url;
         LogInfo(VB_PLUGIN, "URL '%s'\n",repURL.c_str());
@@ -55,9 +50,9 @@ bool ControllerBase::postData(std::string const& url, std::string const& data, s
         curl_easy_setopt(m_curl, CURLOPT_WRITEDATA, &response_string);
 
         CURLcode status = curl_easy_perform(m_curl);
-        if (status != CURLE_OK) {
-            return false;
+        if (status != CURLE_OK) {            
             LogInfo(VB_PLUGIN, "failed to send curl command\n");
+            return false;
         }
         return true;
     }
@@ -90,8 +85,8 @@ bool ControllerBase::getData(std::string const& url, std::string& response_strin
 
         CURLcode status = curl_easy_perform(m_curl);
         if (status != CURLE_OK) {
-            return false;
             LogInfo(VB_PLUGIN, "failed to send curl command\n");
+            return false;
         }
         return true;
     }
