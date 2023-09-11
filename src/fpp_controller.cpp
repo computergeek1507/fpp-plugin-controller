@@ -4,8 +4,8 @@
 #include "common.h"
 #include "settings.h"
 
-FPPController::FPPController(std::string const& ip, unsigned int output_count) :
-    ControllerBase(ip,output_count)
+FPPController::FPPController(std::string const& ip) :
+    ControllerBase(ip)
 {
 }
 

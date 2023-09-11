@@ -1,9 +1,7 @@
 #include "controller_base.h"
 
-ControllerBase::ControllerBase(std::string const& ip, unsigned int output_count) :
-    m_ipAddress(ip),
-    m_outputs(output_count)
-{
+ControllerBase::ControllerBase(std::string const& ip) :
+    m_ipAddress(ip) {
     m_curl = curl_easy_init();
 }
 

@@ -4,9 +4,8 @@
 
 #include <string>
 
-class GeniusController : public ControllerBase{
-public:
-    GeniusController(std::string const& ip, unsigned int output_count );
+struct GeniusController : ControllerBase{
+    explicit GeniusController(std::string const& ip);
     virtual ~GeniusController();
 
     std::string GetType() const override {return "Genius";}
@@ -15,7 +14,4 @@ public:
     bool setTestModeOff() const override;
 
     bool isInTestMode() const override;
-
-private:
-
 };

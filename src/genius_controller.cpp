@@ -4,8 +4,8 @@
 #include "common.h"
 #include "settings.h"
 
-GeniusController::GeniusController(std::string const& ip, unsigned int output_count) :
-    ControllerBase(ip,output_count)
+GeniusController::GeniusController(std::string const& ip) :
+    ControllerBase(ip)
 {
 }
 

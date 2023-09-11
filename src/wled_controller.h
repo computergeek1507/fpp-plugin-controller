@@ -4,9 +4,8 @@
 
 #include <string>
 
-class WLEDController : public ControllerBase{
-public:
-    WLEDController(std::string const& ip, unsigned int output_count );
+struct WLEDController : ControllerBase{
+    explicit WLEDController(std::string const& ip);
     virtual ~WLEDController();
 
     std::string GetType() const override {return "WLED";}
@@ -15,7 +14,4 @@ public:
     bool setTestModeOff() const override;
 
     bool isInTestMode() const override;
-
-private:
-
 };

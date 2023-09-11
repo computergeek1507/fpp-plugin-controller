@@ -4,15 +4,27 @@
 #include "common.h"
 #include "settings.h"
 
-WLEDController::WLEDController(std::string const& ip, unsigned int output_count) :
-    ControllerBase(ip,output_count)
+WLEDController::WLEDController(std::string const& ip) :
+    ControllerBase(ip)
 {
 }
 
 WLEDController::~WLEDController() { }
 
 bool WLEDController::setTestModeOn() const {
-    const std::string data = "{\"seg\":[{\"fx\":34}]}";
+
+    std::string getdata;
+    const std::string geturl = "/json/state";
+    getData(geturl, getdata, "application/json" );
+    Json::Value v = LoadJsonFromString(getdata);
+    
+    std::string data = "{\"seg\":[";
+    for (int i = 0; i < v["seg"].size(); i++) {
+        data += "{\"fx\":34},";
+    }
+    data.pop_back();//remove last comma
+    data += "]}";
+
     const std::string url = "/json";
     bool test = postData(url, data, "application/json" );
     const std::string data2 = "{\"on\":true}";

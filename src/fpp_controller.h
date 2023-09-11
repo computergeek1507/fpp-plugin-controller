@@ -4,9 +4,8 @@
 
 #include <string>
 
-class FPPController : public ControllerBase{
-public:
-    FPPController(std::string const& ip, unsigned int output_count );
+struct FPPController : ControllerBase{
+    explicit FPPController(std::string const& ip);
     virtual ~FPPController();
 
     std::string GetType() const override {return "FPP";}
@@ -15,7 +14,4 @@ public:
     bool setTestModeOff() const override;
 
     bool isInTestMode() const override;
-
-private:
-
 };

@@ -1,7 +1,6 @@
 #pragma once
 
-#include <stdlib.h>
-#include <list>
+#include <cstdint>
 #include <string>
 
 //#include "common.h"
@@ -9,9 +8,8 @@
 
 #include <curl/curl.h>
 
-class ControllerBase {
-public:
-    ControllerBase(std::string const& ip, unsigned int output_count );
+struct ControllerBase {
+    explicit ControllerBase(std::string const& ip);
     virtual ~ControllerBase();
 
     std::string GetIPAddress() const { return m_ipAddress; }
@@ -36,13 +34,9 @@ public:
 
 protected:
     std::string m_ipAddress;
-    uint16_t m_outputs;
     CURL *m_curl;
 
     bool postData(std::string const& url, std::string const& data, std::string const& contentType ) const;
     bool postData(std::string const& url, std::string const& data, std::string& response_string, std::string const& contentType ) const;
     bool getData(std::string const& url, std::string& response_string, std::string const& contentType ) const;
-
-private:
-
 };

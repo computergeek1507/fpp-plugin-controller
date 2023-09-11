@@ -4,9 +4,8 @@
 
 #include <string>
 
-class FalconV4Controller : public ControllerBase{
-public:
-    FalconV4Controller(std::string const& ip, unsigned int output_count );
+struct FalconV4Controller : ControllerBase{
+    explicit FalconV4Controller(std::string const& ip);
     virtual ~FalconV4Controller();
 
     std::string GetType() const override {return "FalconV4";}
@@ -15,7 +14,6 @@ public:
     bool setTestModeOff() const override;
 
     bool isInTestMode() const override;
-
-private:
-
+    
+    int getStringCount() const;
 };

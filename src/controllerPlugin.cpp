@@ -43,14 +43,12 @@ public:
         "Set Controller Test Modes On"), plugin(p) {
             args.push_back(CommandArg("IP", "string", "IP Address"));
             args.push_back(CommandArg("type", "string", "Controller Type").setContentList(CONTROLLER_TYPES).setDefaultValue("FalconV4"));
-            args.push_back(CommandArg("ports", "int", "Set Number of Ports").setRange(0, 128).setDefaultValue("16"));
             args.push_back(CommandArg("check", "bool", "Only do Request If IP is in Multisync List").setDefaultValue("false"));
         }
         
         virtual std::unique_ptr<Command::Result> run(const std::vector<std::string> &args) override {
             std::string ipAddress = "";
             std::string type = "FalconV4";
-            int outputs = 16;
             bool checkList = false;
             if (args.size() >= 1) {
                 ipAddress = args[0];
@@ -59,12 +57,9 @@ public:
                 type = args[1];
             }
             if (args.size() >= 3) {
-                outputs = std::stoi(args[2]);
+                checkList = args[2]=="true";
             }
-            if (args.size() >= 4) {
-                checkList = args[3]=="true";
-            }
-            plugin->SetControllerTestModeOn(ipAddress, type, outputs, checkList);
+            plugin->SetControllerTestModeOn(ipAddress, type, checkList);
             return std::make_unique<Command::Result>("Controller Test Mode On");
         }
         ControllerPlugin *plugin;
@@ -93,7 +88,7 @@ public:
             if (args.size() >= 3) {
                 checkList = args[2]=="true";
             }
-            plugin->SetControllerTestModeOff(ipAddress, type, outputs, checkList);
+            plugin->SetControllerTestModeOff(ipAddress, type, checkList);
             return std::make_unique<Command::Result>("Controller Test Mode Off");
         }
         ControllerPlugin *plugin;
@@ -144,14 +139,12 @@ public:
         "Toggle Controller Test Modes off or on"), plugin(p) {
             args.push_back(CommandArg("IP", "string", "IP Address"));
             args.push_back(CommandArg("type", "string", "Controller Type").setContentList(CONTROLLER_TYPES).setDefaultValue("FalconV4"));
-            args.push_back(CommandArg("ports", "int", "Set Number of Ports").setRange(0, 128).setDefaultValue("16"));
             args.push_back(CommandArg("check", "bool", "Only do Request If IP is in Multisync List").setDefaultValue("false"));
         }
         
         virtual std::unique_ptr<Command::Result> run(const std::vector<std::string> &args) override {
             std::string ipAddress = "";
             std::string type = "FalconV4";
-            int outputs = 16;
             bool checkList = false;
             if (args.size() >= 1) {
                 ipAddress = args[0];
@@ -160,12 +153,9 @@ public:
                 type = args[1];
             }
             if (args.size() >= 3) {
-                outputs = std::stoi(args[2]);
+                checkList = args[2]=="true";
             }
-            if (args.size() >= 4) {
-                checkList = args[3]=="true";
-            }
-            plugin->ToggleControllerTestMode(ipAddress, type, outputs, checkList);
+            plugin->ToggleControllerTestMode(ipAddress, type, checkList);
             return std::make_unique<Command::Result>("Controller Toggle Test Mode");
         }
         ControllerPlugin *plugin;
@@ -229,74 +219,74 @@ public:
         CommandManager::INSTANCE.addCommand(new ControllerSetAllTestModeOff(this));
     }
 
-    std::unique_ptr<ControllerBase> MakeController(std::string const& ip, std::string const& type, int outputs) {
+    std::unique_ptr<ControllerBase> MakeController(std::string const& ip, std::string const& type) {
         if (type.find("FalconV4") != std::string::npos) {
-            return std::move(std::make_unique<FalconV4Controller>(ip, outputs));
+            return std::move(std::make_unique<FalconV4Controller>(ip));
         } else if (type.find("Genius") != std::string::npos) {
-            return std::move(std::make_unique<GeniusController>(ip, outputs));
+            return std::move(std::make_unique<GeniusController>(ip));
         } else if (type.find("FPP") != std::string::npos) {
-            return std::move(std::make_unique<FPPController>(ip, outputs));
+            return std::move(std::make_unique<FPPController>(ip));
         } else if (type.find("FalconV3") != std::string::npos) {
-            return std::move(std::make_unique<FalconV3Controller>(ip, outputs));
+            return std::move(std::make_unique<FalconV3Controller>(ip));
         } else if (type.find("WLED") != std::string::npos) {
-            return std::move(std::make_unique<WLEDController>(ip, outputs));
+            return std::move(std::make_unique<WLEDController>(ip));
         } else {
             LogInfo(VB_PLUGIN, "controller type not found '%s'\n", type.c_str());
         }
         return nullptr;
     }
 
-    std::unique_ptr<ControllerBase> MakeController(std::string const& ip, MultiSyncSystemType const& type, int outputs) {
+    std::unique_ptr<ControllerBase> MakeController(std::string const& ip, MultiSyncSystemType const& type) {
         if (0x88 == type || 0x89 == type) {
-            return std::move(std::make_unique<FalconV4Controller>(ip, outputs));
+            return std::move(std::make_unique<FalconV4Controller>(ip));
         } else if (0xA0 <= type && 0xAA > type) {
-            return std::move(std::make_unique<GeniusController>(ip, outputs));
+            return std::move(std::make_unique<GeniusController>(ip));
         } else if (0x00 < type && 0x80 > type) {
-            return std::move(std::make_unique<FPPController>(ip, outputs));
+            return std::move(std::make_unique<FPPController>(ip));
         } else if (0x85 == type || 0x87 == type) {
-            return std::move(std::make_unique<FalconV3Controller>(ip, outputs));
+            return std::move(std::make_unique<FalconV3Controller>(ip));
         } else if (0xFB == type) {
-            return std::move(std::make_unique<WLEDController>(ip, outputs));
+            return std::move(std::make_unique<WLEDController>(ip));
         } else {
             LogInfo(VB_PLUGIN, "controller type not found '%d'\n", type);
         }
         return nullptr;
     }
 
-    void SetControllerTestModeOn(std::string const& ip, std::string const& type, int outputs, bool checkMulti) {
+    void SetControllerTestModeOn(std::string const& ip, std::string const& type, bool checkMulti) {
         if(ip.find(",") != std::string::npos) {
             auto ips = split(ip, ',');
             for(auto const& ip_ : ips) {
                 if(checkMulti && !IsInMultiSyncList(ip_)) {
                     continue;
                 }
-                std::unique_ptr<ControllerBase> controllerItem = MakeController(ip_, type, outputs);
+                std::unique_ptr<ControllerBase> controllerItem = MakeController(ip_, type);
                 if(controllerItem)controllerItem->setTestModeOn();
             }
         } else {
             if(checkMulti && !IsInMultiSyncList(ip)) {
                 return;
             }
-            std::unique_ptr<ControllerBase> controllerItem = MakeController(ip, type, outputs);
+            std::unique_ptr<ControllerBase> controllerItem = MakeController(ip, type);
             if(controllerItem)controllerItem->setTestModeOn();
         }
     }
 
-    void SetControllerTestModeOff(std::string const& ip, std::string const& type, int outputs, bool checkMulti) {
+    void SetControllerTestModeOff(std::string const& ip, std::string const& type, bool checkMulti) {
         if(ip.find(",") != std::string::npos) {
             auto ips = split(ip, ',');
             for(auto const& ip_ : ips) {
                 if(checkMulti && !IsInMultiSyncList(ip_)) {
                     continue;
                 }
-                std::unique_ptr<ControllerBase> controllerItem = MakeController(ip_, type, outputs);
+                std::unique_ptr<ControllerBase> controllerItem = MakeController(ip_, type);
                 if(controllerItem)controllerItem->setTestModeOff();
             }
         } else {
             if(checkMulti && !IsInMultiSyncList(ip)) {
                 return;
             }
-            std::unique_ptr<ControllerBase> controllerItem = MakeController(ip, type, outputs);
+            std::unique_ptr<ControllerBase> controllerItem = MakeController(ip, type);
             if(controllerItem)controllerItem->setTestModeOff();
         }
     }
@@ -309,7 +299,7 @@ public:
             if(type == MultiSyncSystemType::kSysTypeUnknown) {
                 return;
             }
-                std::unique_ptr<ControllerBase> controllerItem = MakeController(ip_, type, 16);
+                std::unique_ptr<ControllerBase> controllerItem = MakeController(ip_, type);
                 if(controllerItem)controllerItem->setTestModeOn();
             }
         } else {
@@ -317,7 +307,7 @@ public:
             if(type == MultiSyncSystemType::kSysTypeUnknown) {
                 return;
             }
-            std::unique_ptr<ControllerBase> controllerItem = MakeController(ip, type, 16);
+            std::unique_ptr<ControllerBase> controllerItem = MakeController(ip, type);
             if(controllerItem)controllerItem->setTestModeOn();
         }
     }
@@ -330,7 +320,7 @@ public:
                 if(type == MultiSyncSystemType::kSysTypeUnknown) {
                     return;
                 }
-                std::unique_ptr<ControllerBase> controllerItem = MakeController(ip_, type, 16);
+                std::unique_ptr<ControllerBase> controllerItem = MakeController(ip_, type);
                 if(controllerItem)controllerItem->setTestModeOff();
             }
         } else {
@@ -338,26 +328,26 @@ public:
             if(type == MultiSyncSystemType::kSysTypeUnknown) {
                 return;
             }
-            std::unique_ptr<ControllerBase> controllerItem = MakeController(ip, type, 16);
+            std::unique_ptr<ControllerBase> controllerItem = MakeController(ip, type);
             if(controllerItem)controllerItem->setTestModeOff();
         }
     }
 
-    void ToggleControllerTestMode(std::string const& ip, std::string const& type, int outputs, bool checkMulti) {
+    void ToggleControllerTestMode(std::string const& ip, std::string const& type, bool checkMulti) {
         if(ip.find(",") != std::string::npos) {
             auto ips = split(ip, ',');
             for(auto const& ip_ : ips) {
                 if(checkMulti && !IsInMultiSyncList(ip_)) {
                     continue;
                 }
-                std::unique_ptr<ControllerBase> controllerItem = MakeController(ip_, type, outputs);
+                std::unique_ptr<ControllerBase> controllerItem = MakeController(ip_, type);
                 if(controllerItem)controllerItem->toggleTestMode();
             }
         } else {
             if(checkMulti && !IsInMultiSyncList(ip)) {
                 return;
             }
-            std::unique_ptr<ControllerBase> controllerItem = MakeController(ip, type, outputs);
+            std::unique_ptr<ControllerBase> controllerItem = MakeController(ip, type);
             if(controllerItem)controllerItem->toggleTestMode();
         }
     }
@@ -370,7 +360,7 @@ public:
             if(type == MultiSyncSystemType::kSysTypeUnknown) {
                 return;
             }
-                std::unique_ptr<ControllerBase> controllerItem = MakeController(ip_, type, 16);
+                std::unique_ptr<ControllerBase> controllerItem = MakeController(ip_, type);
                 if(controllerItem)controllerItem->toggleTestMode();
             }
         } else {
@@ -378,7 +368,7 @@ public:
             if(type == MultiSyncSystemType::kSysTypeUnknown) {
                 return;
             }
-            std::unique_ptr<ControllerBase> controllerItem = MakeController(ip, type, 16);
+            std::unique_ptr<ControllerBase> controllerItem = MakeController(ip, type);
             if(controllerItem)controllerItem->toggleTestMode();
         }
     }
@@ -388,14 +378,14 @@ public:
             if(system.type == MultiSyncSystemType::kSysTypeUnknown) {
                 return;
             }
-            std::unique_ptr<ControllerBase> controllerItem = MakeController(system.address, system.type, 16);
+            std::unique_ptr<ControllerBase> controllerItem = MakeController(system.address, system.type);
             if(controllerItem)controllerItem->setTestModeOn();
         }
         for (auto system : multiSync->GetRemoteSystems()){
             if(system.type == MultiSyncSystemType::kSysTypeUnknown) {
                 return;
             }
-            std::unique_ptr<ControllerBase> controllerItem = MakeController(system.address, system.type, 16);
+            std::unique_ptr<ControllerBase> controllerItem = MakeController(system.address, system.type);
             if(controllerItem)controllerItem->setTestModeOn();
         }
     }
@@ -405,14 +395,14 @@ public:
             if(system.type == MultiSyncSystemType::kSysTypeUnknown) {
                 return;
             }
-            std::unique_ptr<ControllerBase> controllerItem = MakeController(system.address, system.type, 16);
+            std::unique_ptr<ControllerBase> controllerItem = MakeController(system.address, system.type);
             if(controllerItem)controllerItem->setTestModeOff();
         }
         for (auto system : multiSync->GetRemoteSystems()){
             if(system.type == MultiSyncSystemType::kSysTypeUnknown) {
                 return;
             }
-            std::unique_ptr<ControllerBase> controllerItem = MakeController(system.address, system.type, 16);
+            std::unique_ptr<ControllerBase> controllerItem = MakeController(system.address, system.type);
             if(controllerItem)controllerItem->setTestModeOff();
         }
     }
