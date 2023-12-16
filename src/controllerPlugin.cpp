@@ -239,7 +239,7 @@ public:
     std::unique_ptr<ControllerBase> MakeController(std::string const& ip, MultiSyncSystemType const& type) {
         if (0x88 == type || 0x89 == type) {
             return std::move(std::make_unique<FalconV4Controller>(ip));
-        } else if (0xA0 <= type && 0xAA > type) {
+        } else if (0xA0 <= type && 0xAF >= type) {
             return std::move(std::make_unique<GeniusController>(ip));
         } else if (0x00 < type && 0x80 > type) {
             return std::move(std::make_unique<FPPController>(ip));
