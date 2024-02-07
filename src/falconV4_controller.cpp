@@ -41,8 +41,31 @@ bool FalconV4Controller::setTestModeOn() const {
     return test;
 }
 
-bool FalconV4Controller::setTestModeOff() const {
+bool FalconV4Controller::setTestModeOnPort(int portNum) const {
+    auto outputs = getStringCount();
 
+    if(portNum > outputs)
+    {
+        return false;
+    }
+    //{"T":"Q","M":"ST","B":0,"E":0,"I":0,"P":{}}
+    //{"T":"S","M":"TS","B":0,"E":0,"I":0,"P":{"E":"Y","D":"N","S":20,"Y":1,"A":[]}}
+    const std::string cmd2 = R"({"T":"S","M":"TS","B":0,"E":0,"I":0,"P":{"E":"Y","D":"N","S":20,"Y":1,"A":[]}})";
+    bool worked = postData("/api", cmd2, "application/json");
+    //setTestModeOff();
+
+    //{"T":"S","M":"TS","B":0,"E":2,"I":0,"P":{"E":"Y","D":"N","S":20,"Y":1,"A":[{"P":0,"R":0,"S":0},{"P":2,"R":0,"S":0}]}}
+                       //{"T":"S","M":"TS","B":0,"E":1,"I":0,"P":{"E":"Y","D":"N","S":20,"Y":1,"A":[{"P":0,"R":0,"S":0}]}}
+                       //{"T":"S","M":"TS","B":0,"E":1,"I":0,"P":{"E":"Y","D":"N","S":20,"Y":1,"A":[{"P":1,"R":0,"S":0}]}}
+    std::string cmd = R"({"T":"S","M":"TS","B":0,"E":1,"I":0,"P":{"E":"Y","D":"N","S":20,"Y":1,"A":[{"P":)";
+    cmd += std::to_string(portNum-1);
+    cmd += R"(,"R":0,"S":0}]}})";
+    return postData("/api", cmd, "application/json");
+}
+
+
+bool FalconV4Controller::setTestModeOff() const {
+                             //{"T":"S","M":"TS","B":0,"E":0,"I":0,"P":{"E":"Y","D":"N","S":20,"Y":1,"A":[]}}
     const std::string cmd = R"({"T":"S","M":"TS","B":0,"E":16,"I":0,"P":{"E":"N","D":"Y","S":20,"Y":1,"A":[]}})";
     return postData("/api", cmd, "application/json");
 }

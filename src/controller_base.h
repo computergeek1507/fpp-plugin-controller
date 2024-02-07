@@ -17,6 +17,7 @@ struct ControllerBase {
 
     virtual bool setTestModeOn() const = 0;
     virtual bool setTestModeOff() const = 0;
+    virtual bool setTestModeOnPort(int portNum) const { return false; };
 
     virtual bool toggleTestMode() const;
     virtual bool isInTestMode() const = 0;

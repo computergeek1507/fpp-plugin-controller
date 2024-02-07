@@ -12,6 +12,9 @@ struct FPPController : ControllerBase{
 
     bool setTestModeOn() const override;
     bool setTestModeOff() const override;
+    bool setTestModeOnPort(int portNum) const override;
 
     bool isInTestMode() const override;
+
+    std::pair<int, int> getPortChannels(int port) const;
 };

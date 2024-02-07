@@ -12,6 +12,7 @@ struct FalconV4Controller : ControllerBase{
 
     bool setTestModeOn() const override;
     bool setTestModeOff() const override;
+    bool setTestModeOnPort(int portNum) const override;
 
     bool isInTestMode() const override;
     
