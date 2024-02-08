@@ -26,7 +26,7 @@ bool FPPController::setTestModeOff() const {
 bool FPPController::setTestModeOnPort(int portNum) const {
 
     auto [ start, end ] = getPortChannels(portNum);
-    std::string data= "{\"mode\":\"RGBChase\",\"subMode\":\"RGBChase-RGB\",\"cycleMS\": 1000,\"colorPattern\": \"FF000000FF000000FF\",\"enabled\": 0,\"channelSet\":\"" + std::to_string(start) + "-" + std::to_string(end) + "\",\"channelSetType\":\"channelRange\"}";
+    std::string data= "{\"mode\":\"RGBChase\",\"subMode\":\"RGBChase-RGB\",\"cycleMS\": 1000,\"colorPattern\": \"FF000000FF000000FF\",\"enabled\": 1,\"channelSet\":\"" + std::to_string(start) + "-" + std::to_string(end) + "\",\"channelSetType\":\"channelRange\"}";
     const std::string url = "/api/testmode";
     return postData(url, data, "application/json" );
 }
