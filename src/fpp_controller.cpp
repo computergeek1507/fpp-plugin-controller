@@ -51,7 +51,7 @@ std::pair<int, int> FPPController::getPortChannels(int port) const {
     Json::Value sv = LoadJsonFromString(data);
     std::string plat = sv["Platform"].asString();
     
-    if(plat.find("Beagle") != std::string::npos) {
+    if(plat.find("Beagle") == std::string::npos) {
         const std::string url2 = "/api/channel/output/co-pixelStrings";
         getData(url2, data, "application/json" );
     } else {
