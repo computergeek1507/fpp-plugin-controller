@@ -28,11 +28,13 @@ bool ControllerBase::postData(std::string const& url, std::string const& data, s
 bool ControllerBase::postData(std::string const& url, std::string const& data, std::string& response_string, std::string const& contentType) const {
     try {
         curl_easy_setopt(m_curl, CURLOPT_HTTPPOST, 1L);
-
-        std::string const content = "Content-Type: " + contentType;
-        struct curl_slist *hs = NULL;
-        hs = curl_slist_append(hs, content.c_str());
-        curl_easy_setopt(m_curl, CURLOPT_HTTPHEADER, hs);
+        //curl_easy_setopt(m_curl, CURLOPT_CUSTOMREQUEST, "POST");
+        if(!contentType.empty()) {
+            std::string const content = "Content-Type: " + contentType;
+            struct curl_slist *hs = NULL;
+            hs = curl_slist_append(hs, content.c_str());
+            curl_easy_setopt(m_curl, CURLOPT_HTTPHEADER, hs);
+        }
 
         LogInfo(VB_PLUGIN, "Data '%s'\n",data.c_str());
         curl_easy_setopt(m_curl, CURLOPT_POSTFIELDS, data.c_str());
@@ -62,13 +64,16 @@ bool ControllerBase::postData(std::string const& url, std::string const& data, s
 
 bool ControllerBase::getData(std::string const& url, std::string& response_string, std::string const& contentType) const {
     try {
+        response_string.clear();
         curl_easy_setopt(m_curl, CURLOPT_HTTPGET, 1L);
-
-        std::string const content = "Content-Type: " + contentType;
-        struct curl_slist *hs = NULL;
-        hs = curl_slist_append(hs, content.c_str());
-        curl_easy_setopt(m_curl, CURLOPT_HTTPHEADER, hs);
-
+        curl_easy_setopt(m_curl, CURLOPT_CUSTOMREQUEST, "GET");
+        if(!contentType.empty()){
+            LogInfo(VB_PLUGIN, "contentType '%s'\n",contentType.c_str());
+            std::string const content = "Content-Type: " + contentType;
+            struct curl_slist *hs = NULL;
+            hs = curl_slist_append(hs, content.c_str());
+            curl_easy_setopt(m_curl, CURLOPT_HTTPHEADER, hs);
+        }
         std::string const repURL = "http://" + m_ipAddress + url;
         LogInfo(VB_PLUGIN, "URL '%s'\n",repURL.c_str());
         curl_easy_setopt(m_curl, CURLOPT_URL, repURL.c_str());
@@ -82,6 +87,7 @@ bool ControllerBase::getData(std::string const& url, std::string& response_strin
         curl_easy_setopt(m_curl, CURLOPT_WRITEDATA, &response_string);
 
         CURLcode status = curl_easy_perform(m_curl);
+        //LogInfo(VB_PLUGIN, "Response '%s'\n",response_string.c_str());
         if (status != CURLE_OK) {
             LogInfo(VB_PLUGIN, "failed to send curl command\n");
             return false;
